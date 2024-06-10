@@ -7,7 +7,7 @@ const fs = require('fs');
 const fetch = require('node-fetch');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const upload = multer({ dest: 'uploads/' });
 
@@ -65,7 +65,6 @@ app.post('/upload-csv', upload.single('csvFile'), (req, res) => {
         .on('end', async () => {
             console.log('CSV data:', results);
 
-            // CSV 파일의 첫 번째 행 데이터를 사용합니다.
             const { move, exercise, stand, steps, distance } = results[0];
             const prompt = `An abstract artwork that reflects the following activities: 
                             Move: ${move} minutes, 
@@ -84,7 +83,7 @@ app.post('/upload-csv', upload.single('csvFile'), (req, res) => {
                     body: JSON.stringify({
                         model: 'dall-e-2',
                         prompt,
-                        n: 3,  // CSV 파일 하나당 3개의 이미지를 생성하도록 설정
+                        n: 3,
                         size: "512x512",
                     }),
                 });
@@ -104,7 +103,7 @@ app.post('/upload-csv', upload.single('csvFile'), (req, res) => {
                 res.status(500).json({ error: 'Failed to generate image', details: error });
             }
 
-            fs.unlinkSync(filePath); // CSV 파일 삭제
+            fs.unlinkSync(filePath);
         });
 });
 
